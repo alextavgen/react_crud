@@ -23,65 +23,18 @@ class App extends React.Component {
 
   render() {
     const examples = [ {
-      text: 'Basic Table',
-      href: 'basic'
-    }, {
-      text: 'Work on Column',
-      href: 'column'
-    }, {
-      text: 'Table Sort',
-      href: 'sort'
-    }, {
-      text: 'Column Format',
-      href: 'column-format'
-    }, {
-      text: 'Column Filter',
-      href: 'column-filter'
-    }, {
-      text: 'Column Header Span',
-      href: 'column-header-span'
-    }, {
-      text: 'Row Selection',
-      href: 'selection'
-    }, {
-      text: 'Pagination',
-      href: 'pagination'
-    }, {
-      text: 'Table Manipulation',
-      href: 'manipulation'
-    }, {
-      text: 'Cell Edit',
-      href: 'cell-edit'
-    }, {
-      text: 'Table Styling',
-      href: 'style'
-    }, {
-      text: 'Remote Data',
-      href: 'remote'
-    }, {
-      text: 'Advance data edit&insert',
-      href: 'advance'
-    }, {
-      text: 'Expandable Row',
-      href: 'expandRow'
-    }, {
-      text: 'KeyBoard Navigation',
-      href: 'keyboard-nav'
-    }, {
-      text: 'Other',
-      href: 'others'
-    }, {
-      text: 'A complex demo',
-      href: 'complex'
-    }, {
-      text: 'Custom',
-      href: 'custom'
-    } ];
+      text: 'Error Codes',
+      href: 'error-codes'
+    },
+      {
+        text: 'Limited Sets',
+        href: 'limited-sets'
+      } ];
 
     const exampleMenuItems = examples.map((item) => {
       return (
         <li key={ item.href }>
-          <a href={ `#/examples/${item.href}` }>{ item.text }</a>
+          <a href={ `#/admin/${item.href}` }>{ item.text }</a>
         </li>
       );
     });
@@ -90,7 +43,7 @@ class App extends React.Component {
         <nav className='navbar navbar-inverse'>
           <div className='container-fluid'>
             <div className='navbar-header'>
-              <a className='navbar-brand' href='#'>react-bootstrap-table</a>
+              <a className='navbar-brand' href='#'>Admin Page for Configurations</a>
             </div>
             <div className='collapse navbar-collapse'>
               <ul className='nav navbar-nav'>
@@ -98,10 +51,10 @@ class App extends React.Component {
                   <a href='#/getting-started'>Getting Started</a>
                 </li>
                 <li>
-                  <a href='https://github.com/AllenFang/react-bootstrap-table'>Github</a>
+                  <a href='#'>Git Repository</a>
                 </li>
                 <li className='dropdown'>
-                  <a href='#' className='dropdown-toggle' data-toggle='dropdown' role='button' aria-haspopup='true' aria-expanded='false'>Examples <span className='caret'></span></a>
+                  <a href='#' className='dropdown-toggle' data-toggle='dropdown' role='button' aria-haspopup='true' aria-expanded='false'>Configurations <span className='caret'></span></a>
                   <ul className='dropdown-menu'>
                     { exampleMenuItems }
                   </ul>

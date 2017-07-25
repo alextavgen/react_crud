@@ -7,8 +7,8 @@ class Demo extends React.Component {
     return (
       <div className='col-md-offset-1 col-md-8'>
         <div className='panel panel-default'>
-          <div className='panel-heading'>A Complex Example</div>
-          <h5>Source in /examples/js/complex/app.js</h5>
+          <div className='panel-heading'>Error Codes for Galaxy API</div>
+          <h5>Source in GIT_REPO_PATH</h5>
           <div className='panel-body'>
             <App />
           </div>

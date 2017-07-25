@@ -4,28 +4,17 @@
 /* eslint max-len: 0 */
 import React from 'react';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
-
-
-const jobs = [];
-
-function addJobs(quantity) {
-  const startId = jobs.length;
-  for (let i = 0; i < quantity; i++) {
-    const id = startId + i;
-    let priority = 'D';
-    if (i % 2 === 0) priority = 'C';
-    if (i % 5 === 0) priority = 'B';
-    if (i % 7 === 0) priority = 'A';
-    jobs.push({
-      id: id,
-      name: 'Item name ' + id,
-      priority: priority,
-      active: i%2 === 0 ? 'Y' : 'N'
-    });
-  }
+const REST_POINT = 'http://localhost:8080/error_code';
+const REST_POINT_POST = 'http://localhost:8080/error_code';
+let objRef;
+function populateTable() {
+  fetch(REST_POINT)
+        .then(result => result.json())
+        .then(params => {
+          console.log(params);
+          objRef.setState({ data: params });
+        });
 }
-
-addJobs(70);
 
 function onRowSelect(row, isSelected) {
   console.log(row);
@@ -37,9 +26,23 @@ function onSelectAll(isSelected) {
 }
 
 function onAfterSaveCell(row, cellName, cellValue) {
+  fetch(REST_POINT_POST, {
+    mode: 'cors',
+    method: 'PUT',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Headers': 'Content-Type'
+    },
+    body: JSON.stringify(row)
+  })
+  .then(result => result.json())
+  .then(result => console.log(result))
+  .catch((err) => console.log('error', err));
   console.log(`Save cell ${cellName} with value ${cellValue}`);
   console.log('The whole row :');
   console.log(row);
+  populateTable();
 }
 
 function onAfterTableComplete() {
@@ -47,13 +50,40 @@ function onAfterTableComplete() {
 }
 
 function onAfterDeleteRow(rowKeys) {
+  fetch(REST_POINT_POST + '/' + rowKeys, {
+    mode: 'cors',
+    method: 'DELETE',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Headers': 'Content-Type'
+    }
+  })
+  .then(result => result.json())
+  .then(result => console.log(result))
+  .catch((err) => console.log('error', err));
   console.log('onAfterDeleteRow');
   console.log(rowKeys);
+  populateTable();
 }
 
 function onAfterInsertRow(row) {
   console.log('onAfterInsertRow');
   console.log(row);
+  fetch(REST_POINT_POST, {
+    mode: 'no-cors',
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Headers': 'Content-Type'
+    },
+    body: JSON.stringify(row)
+  })
+  .then(result => result.json())
+  .then(result => console.log(result))
+  .catch((err) => console.log('error', err));
+  populateTable();
 }
 
 const selectRowProp = {
@@ -73,7 +103,7 @@ const cellEditProp = {
 
 const options = {
   paginationShowsTotal: true,
-  sortName: 'name',  // default sort column name
+  sortName: 'id',  // default sort column name
   sortOrder: 'desc',  // default sort order
   afterTableComplete: onAfterTableComplete, // A hook for after table render complete.
   afterDeleteRow: onAfterDeleteRow,  // A hook for after droping rows.
@@ -88,7 +118,7 @@ function priorityFormatter(cell, row) {
 }
 
 function trClassNameFormat(rowData, rIndex) {
-  return rIndex % 3 === 0 ? 'third-tr' : '';
+  return rIndex % 2 === 0 ? 'second-tr' : '';
 }
 function nameValidator(value) {
   if (!value) {
@@ -106,9 +136,22 @@ function priorityValidator(value) {
 }
 
 export default class App extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      data: []
+    };
+  }
+
+  componentDidMount() {
+    objRef = this;
+    populateTable();
+  }
+
+
   render() {
     return (
-      <BootstrapTable data={ jobs }
+      <BootstrapTable data={ this.state.data }
         trClassName={ trClassNameFormat }
         selectRow={ selectRowProp }
         cellEdit={ cellEditProp }
@@ -119,16 +162,13 @@ export default class App extends React.Component {
         columnFilter
         hover
         pagination>
-        <TableHeaderColumn dataField='id' dataAlign='center' dataSort isKey autoValue>Job ID</TableHeaderColumn>
-        <TableHeaderColumn dataField='name' className='good' dataSort
-          editable={ { type: 'textarea', validator: nameValidator } }>Job Name</TableHeaderColumn>
-        <TableHeaderColumn dataField='priority' dataSort dataFormat={ priorityFormatter }
-          editable={ {
-            type: 'select',
-            options: { values: [ 'A', 'B', 'C', 'D' ] },
-            validator: priorityValidator } }>Job Priority</TableHeaderColumn>
-        <TableHeaderColumn dataField='active'
-          editable={ { type: 'checkbox', options: { values: ' Y:N' } } }>Active</TableHeaderColumn>
+        <TableHeaderColumn dataField='id' dataAlign='center' dataSort isKey>Error ID</TableHeaderColumn>
+        <TableHeaderColumn dataField='code' className='good' dataSort
+          editable={ { type: 'textarea', validator: nameValidator } }>Error Code</TableHeaderColumn>
+				<TableHeaderColumn dataField='descr' dataSort
+          editable={ { type: 'textarea', validator: nameValidator } }>Description</TableHeaderColumn>
+          <TableHeaderColumn dataField='group' dataSort
+          editable={ { type: 'textarea', validator: nameValidator } }>Group</TableHeaderColumn>
       </BootstrapTable>
     );
   }
