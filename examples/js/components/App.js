@@ -25,11 +25,13 @@ class App extends React.Component {
     const examples = [ {
       text: 'Error Codes',
       href: 'error-codes'
-    },
-      {
-        text: 'Limited Sets',
-        href: 'limited-sets'
-      } ];
+    }, {
+      text: 'Limited Sets',
+      href: 'limited-sets'
+    }, {
+      text: 'ClientAPI Entities',
+      href: 'client-api'
+    } ];
 
     const exampleMenuItems = examples.map((item) => {
       return (

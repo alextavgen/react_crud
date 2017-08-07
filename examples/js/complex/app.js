@@ -42,7 +42,7 @@ function onAfterSaveCell(row, cellName, cellValue) {
   console.log(`Save cell ${cellName} with value ${cellValue}`);
   console.log('The whole row :');
   console.log(row);
-  populateTable();
+  // populateTable();
 }
 
 function onAfterTableComplete() {
@@ -64,7 +64,7 @@ function onAfterDeleteRow(rowKeys) {
   .catch((err) => console.log('error', err));
   console.log('onAfterDeleteRow');
   console.log(rowKeys);
-  populateTable();
+  // populateTable();
 }
 
 function onAfterInsertRow(row) {
@@ -83,7 +83,7 @@ function onAfterInsertRow(row) {
   .then(result => result.json())
   .then(result => console.log(result))
   .catch((err) => console.log('error', err));
-  populateTable();
+  // populateTable();
 }
 
 const selectRowProp = {
@@ -104,17 +104,16 @@ const cellEditProp = {
 const options = {
   paginationShowsTotal: true,
   sortName: 'id',  // default sort column name
-  sortOrder: 'desc',  // default sort order
+  sortOrder: 'asc',  // default sort order
   afterTableComplete: onAfterTableComplete, // A hook for after table render complete.
   afterDeleteRow: onAfterDeleteRow,  // A hook for after droping rows.
-  afterInsertRow: onAfterInsertRow   // A hook for after insert rows
+  afterInsertRow: onAfterInsertRow,   // A hook for after insert rows
+  sizePerPage: 30
 };
 
 
-function priorityFormatter(cell, row) {
-  if (cell === 'A') return '<font color="red">' + cell + '</font>';
-  else if (cell === 'B') return '<font color="orange">' + cell + '</font>';
-  else return cell;
+function errorCodeFormatter(cell, row) {
+  return '<font color="red">' + cell + '</font>';
 }
 
 function trClassNameFormat(rowData, rIndex) {
@@ -122,15 +121,9 @@ function trClassNameFormat(rowData, rIndex) {
 }
 function nameValidator(value) {
   if (!value) {
-    return 'Job Name is required!';
+    return 'Error Code required.';
   } else if (value.length < 3) {
-    return 'Job Name length must great 3 char';
-  }
-  return true;
-}
-function priorityValidator(value) {
-  if (!value) {
-    return 'Priority is required!';
+    return 'Error Code length must great 3 char';
   }
   return true;
 }
@@ -162,8 +155,8 @@ export default class App extends React.Component {
         columnFilter
         hover
         pagination>
-        <TableHeaderColumn dataField='id' dataAlign='center' dataSort isKey>Error ID</TableHeaderColumn>
-        <TableHeaderColumn dataField='code' className='good' dataSort
+        <TableHeaderColumn dataField='id' width='5%' dataAlign='center' dataSort={ true } isKey>Error ID</TableHeaderColumn>
+        <TableHeaderColumn dataField='code' dataFormat={ errorCodeFormatter } className='good' dataSort
           editable={ { type: 'textarea', validator: nameValidator } }>Error Code</TableHeaderColumn>
 				<TableHeaderColumn dataField='descr' dataSort
           editable={ { type: 'textarea', validator: nameValidator } }>Description</TableHeaderColumn>
