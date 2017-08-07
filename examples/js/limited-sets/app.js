@@ -6,6 +6,7 @@ import { Button, DropdownButton, MenuItem, ButtonToolbar } from 'react-bootstrap
 let objRef;
 let arr;
 const REST_POINT = 'http://localhost:8080/limited_set/licensees';
+const REST_POINT_CLIENT_API = 'http://192.168.64.183:8080/clientapi_ops';
 // const ELEMENTS = [ 'Coral', 'LadBrokes', 'WAF' ];
 
 function onRowSelect(row, isSelected) {
@@ -18,11 +19,16 @@ function onSelectAll(isSelected) {
 }
 
 function onAfterSaveCell(row, cellName, cellValue) {
+  if (cellName === 'service') row.operation = '';
   console.log('After save row', cellName, cellValue, row);
 }
 
 function onAfterTableComplete() {
   console.log('Table render complete.');
+}
+
+function onRowClick(row, cellName, cellValue) {
+  console.log('After save row', cellName, cellValue, row);
 }
 
 function onAfterDeleteRow(rowKeys) {
@@ -86,6 +92,7 @@ const cellEditProp = {
 
 const options = {
   paginationShowsTotal: true,
+  onRowClick: onRowClick,
   sortName: 'service',  // default sort column name
   sortOrder: 'asc',  // default sort order
   afterTableComplete: onAfterTableComplete, // A hook for after table render complete.
@@ -99,17 +106,21 @@ function renderMenuItem(title) {
   );
 }
 
-function nameValidator(value) {
-  if (!value) {
-    return 'Name is required!';
-  } else if (value.length < 3) {
-    return 'Name length must great 3 char';
-  }
-  return true;
+function opsValidator(value, row) {
+  if (row.service === value.split('/')[0]) return true;
+  else return 'Should be same name service';
 }
 
 function trClassNameFormat(rowData, rIndex) {
   return rIndex % 2 === 0 ? 'second-tr' : '';
+}
+
+function opsCellFormat(rowData) {
+  if (rowData.indexOf('/') > -1) {
+    const ops = rowData.split('/');
+    return '<strong>' + ops[0] + '</strong>/' + ops[1];
+  }
+  else return rowData;
 }
 
 export default class App extends React.Component {
@@ -120,7 +131,9 @@ export default class App extends React.Component {
       reviewTitle: 'Review Date',
       reviewData: [],
       data: [],
-      tableData: []
+      tableData: [],
+      opsData: [],
+      serviceData: []
     };
     objRef = this;
     this.handleSelect = this.handleSelect.bind(this);
@@ -132,6 +145,20 @@ export default class App extends React.Component {
         .then(params => {
           console.log('Before Mount');
           this.setState({ data: params });
+        });
+    // this.forceUpdate();
+    fetch(REST_POINT_CLIENT_API)
+        .then(result => result.json())
+        .then(params => {
+          console.log('Before Mount');
+          this.setState({ serviceData: params });
+        });
+    // this.forceUpdate();
+    fetch(REST_POINT_CLIENT_API + '/operations')
+        .then(result => result.json())
+        .then(params => {
+          console.log('Before Mount');
+          this.setState({ opsData: params });
         });
     // this.forceUpdate();
   }
@@ -182,9 +209,9 @@ export default class App extends React.Component {
             pagination>
             <TableHeaderColumn dataField='id' dataAlign='center' dataSort isKey autoValue={ true } hidden={ true }>Id</TableHeaderColumn>
             <TableHeaderColumn dataField='service' className='good' dataSort
-              editable={ { type: 'textarea', validator: nameValidator } }>Service</TableHeaderColumn>
-            <TableHeaderColumn dataField='operation' dataSort
-              editable={ { type: 'textarea', validator: nameValidator } }>Operation</TableHeaderColumn>
+             editable={ { type: 'select', options: { values: this.state.serviceData } } }>Service</TableHeaderColumn>
+            <TableHeaderColumn dataField='operation' dataFormat={ opsCellFormat } dataSort
+              editable={ { type: 'select', options: { values: this.state.opsData }, validator: opsValidator } }>Operation</TableHeaderColumn>
           </BootstrapTable>
         </div>
         <ButtonToolbar>
